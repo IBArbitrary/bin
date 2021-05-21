@@ -1,0 +1,6 @@
+#! /usr/bin/env bash
+for repo in core extra community; do
+    echo -n "$repo "
+    pacman -Sl "$repo" | grep "\[installed\]$" -c
+done | column -t;
+echo "total " "$(yay -Q | wc -l)" | column -t -o "      "

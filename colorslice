@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+
+# Print a slice of color like:
+# ________________
+# |green      red|
+# |              |
+# |cyan   magenta|
+# ----------------
+#
+# It should look smooth if your terminal supports enough colors.
+
+#clear
+b=0
+
+get_screen_size()
+{
+  local sizes=$(stty size)
+  if [ $? = 0 ] ; then
+    set $sizes
+    screen_rows="$1"
+    screen_cols="$2"
+  fi
+}
+
+get_screen_size
+
+rows=$((screen_rows - 2))
+cols=$((screen_cols - 1))
+blue_step=$((255 / rows))
+red_green_step=$((255 / cols))
+
+row=0
+b=0
+while [ $row -lt $rows ] ; do
+  col=0
+  r=0
+  g=255
+  while [ $col -lt $cols ] ; do
+    #printf "\e[38;2;${r};${g};${b}m#"
+    printf "\e[48;2;${r};${g};${b}m "
+    r=$((r + red_green_step))
+    g=$((g - red_green_step))
+    col=$((col + 1))
+  done
+  printf "\e[0m\n"
+  b=$((b + blue_step))
+  row=$((row + 1))
+done
+printf "\e[0m"
+exit 0

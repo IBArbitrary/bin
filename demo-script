@@ -1,0 +1,17 @@
+#! /usr/bin/env bash
+
+function usage {
+    echo "Usage..."
+}
+
+while getopts 'ah' flag; do
+    case "${flag}" in
+        a) test="sike" ;;
+        h) test="no-sike"
+           usage
+           exit 1;;
+    esac
+done
+
+echo $test $0
+exit 0

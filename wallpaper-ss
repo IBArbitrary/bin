@@ -1,0 +1,16 @@
+#! /usr/bin/env python3
+import os
+from os import listdir
+from os.path import isfile, join
+import time
+
+wp_dir = "/home/rajeshkumar/Pictures/wallpapers/"
+images = [f for f in listdir(wp_dir) if isfile(join(wp_dir,f))]
+n_images = len(images)
+
+ind = 0
+while True:
+    ind = ind % (n_images+1)
+    os.system('feh --auto-rotate --bg-fill ' + join(wp_dir,images[ind]))
+    time.sleep(0.5)
+    ind += 1

@@ -1,0 +1,39 @@
+#! /usr/bin/env bash
+
+AUTHOR="IBArbitrary"
+name=$(echo $0 | cut -d "/" -f5)
+
+function usage {
+    echo "Usage: $name [ -t HEADER-TEXT ] [ -c COMMENT-CHAR ] [ -r RULE_CHAR ]"
+    exit 1
+}
+
+while getopts 't:c:r:h' flag; do
+  case "${flag}" in
+    t) header="${OPTARG}" ;;
+    c) comment="${OPTARG}" ;;
+    r) rule="${OPTARG}" ;;
+    h) usage ;;
+  esac
+done
+
+rule=$(printf "$comment";printf "$rule%.0s" {1..79})
+appname=$(while IFS= read -r line; do
+              echo "$line" | sed -e "s/^/$comment /"
+          done <<< $(toilet -f "ANSI Shadow" $header) | sed '$d')
+auth=$(while IFS= read -r line; do
+           echo "$line" | sed -e "s/^/$comment /"
+       done <<< $(toilet -f rustofat $AUTHOR))
+
+function makeHeader {
+    echo "$rule"
+    echo "$appname"
+    echo "$rule"
+    echo "$auth"
+    echo "$rule"
+}
+
+out=$(makeHeader)
+printf "$out" | xclip -selection clipboard
+printf "$out"
+exit 0

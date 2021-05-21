@@ -1,0 +1,62 @@
+#! /usr/bin/env python3
+
+import os
+import random
+
+PATH = os.getcwd()
+BLACKLIST = [".git"]
+ATLAS = [i for i in "abcdefghijklmnopqrstuvwxyz"]
+
+
+def permutation(n, r):
+    def factorial(n):
+        if n == 0:
+            return 1
+        else:
+            return n*factorial(n-1)
+    return int(factorial(n)/factorial(n-r))
+
+
+def nameGenerator(template: list, length: int) -> str:
+    name = []
+    while len(name) < length:
+        letter = random.choice(template)
+        if letter not in name:
+            name.append(letter)
+    return "".join(name)
+
+
+def multiNameGenerator(template: list, length: int, amt: int) -> str:
+    names = []
+    while len(names) < amt:
+        name = nameGenerator(template, length)
+        if name not in names:
+            names.append(name)
+    return names
+
+
+def randomRenamer(dire: str, blacklist: list, atlas: list, length: int) -> None:
+    oldFiles = [i for i in os.listdir(dire) if i not in blacklist]
+    nFiles = len(oldFiles)
+    interFiles = [str(_+1).zfill(4)+os.path.splitext(oldFiles[_])[-1]
+                  for _ in range(nFiles)]
+    newNames = multiNameGenerator(atlas, length, nFiles)
+    newFiles = [newNames[_] +
+                os.path.splitext(oldFiles[_])[-1] for _ in range(nFiles)]
+    confirmation = input(f"Are you sure you want to rename {nFiles} files? (Y/n) ")
+    if confirmation in ["y", ""]:
+        for _ in range(nFiles):
+            os.rename(os.path.join(dire, oldFiles[_]), os.path.join(
+                dire, interFiles[_]))
+        for _ in range(nFiles):
+            os.rename(os.path.join(
+                dire, interFiles[_]), os.path.join(dire, newFiles[_]))
+        print("Renamed %d files" % nFiles)
+    elif confirmation=="n":
+        pass
+    else:
+        print("Invalid option entered.")
+
+
+if __name__ == "__main__":
+    randomRenamer(PATH, BLACKLIST, ATLAS, 8)

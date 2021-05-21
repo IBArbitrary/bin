@@ -1,0 +1,23 @@
+#! /usr/bin/env bash
+
+BOOK_DIR="/media/storage/books"
+
+CWD=$(pwd)
+cd $BOOK_DIR
+books=$(find * -type f |
+            fzf --header="Choose books." -m)
+n_books=$(echo "$books" | wc -l)
+if [ ! -z "$books" ]
+then
+    for book in $books
+    do
+        zathura $book &
+    done
+    echo "Opened $n_books books."
+    cd $CWD
+    exit 0
+else
+    echo "No books selected."
+    cd $CWD
+    exit 1
+fi

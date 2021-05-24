@@ -9,10 +9,11 @@ books=$(find * -type f |
 n_books=$(echo "$books" | wc -l)
 if [ ! -z "$books" ]
 then
-    for book in $books
-    do
-        zathura $book &
-    done
+    #for book in $books
+    #do
+        #zathurat $book &
+    #done
+    tabbed -c -r 2 zathura -e id $books & disown
     echo "Opened $n_books books."
     cd $CWD
     exit 0

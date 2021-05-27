@@ -6,7 +6,9 @@ import random
 PATH = os.getcwd()
 BLACKLIST = [".git"]
 ATLAS = [i for i in "abcdefghijklmnopqrstuvwxyz"]
+WALL_DIR = "/media/storage/pictures/wallpapers/"
 
+prevFiles = [os.path.splitext(f)[0] for f in os.listdir(WALL_DIR)]
 
 def permutation(n, r):
     def factorial(n):
@@ -31,7 +33,8 @@ def multiNameGenerator(template: list, length: int, amt: int) -> str:
     while len(names) < amt:
         name = nameGenerator(template, length)
         if name not in names:
-            names.append(name)
+            if name not in prevFiles:
+                names.append(name)
     return names
 
 

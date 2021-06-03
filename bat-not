@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+warn_level=10
+info_level=25
+warn_icon="/usr/share/icons/Papirus-Dark/24x24/status/stock_dialog-error.svg"
+info_icon="/usr/share/icons/Papirus-Dark/24x24/status/stock_dialog-warning.svg"
+
+status=$(cat /sys/class/power_supply/ACAD/online)
+battery_level=$(acpi -b | grep -P -o '[0-9]+(?=%)')
+if [ $battery_level -le $info_level -a $battery_level -gt $warn_level -a $status -eq "0" ]
+then
+      notify-send --urgency critical -i "$info_icon" "Battery low" "Battery level is $battery_level%!"
+elif [ $battery_level -le $warn_level -a $status -eq "0" ]
+then
+      notify-send --urgency critical -i "$warn_icon" "Battery low" "Battery level is $battery_level%!"
+fi

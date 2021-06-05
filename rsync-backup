@@ -1,0 +1,54 @@
+#!/usr/bin/env bash
+
+info () {
+    printf "\n%s %s\n\n" "$(date)" "$argv" >&2;
+}
+
+trap 'echo $( date ) Backup interrupted >&2; exit 2' INT TERM
+
+info "Starting backup"
+notify-send "rsync" "Starting daily backup..."
+
+export BACKUP_LOCATION='/media/storage/backup/arch/'
+
+sudo rsync -aAXHRv \
+    --delete \
+    --exclude caches/ \
+    --exclude '/home/*/.cache/*' \
+    --exclude '/var/tmp/*' \
+    --exclude '/var/cache/*' \
+    --exclude '/var/lock/*' \
+    --exclude '/var/run/*' \
+    --exclude '/var/spool/*' \
+    --exclude '/opt/*' \
+    --exclude '/dev/*' \
+    --exclude '/tmp/*' \
+    --exclude '/proc/*' \
+    --exclude '/lost+found' \
+    --exclude '/mnt/*' \
+    --exclude '/media/*' \
+    --exclude '/run/*' \
+    --exclude '/sys/*' \
+    /etc \
+    /home \
+    /root \
+    /var \
+    /usr/local \
+    $BACKUP_LOCATION
+
+backup_exit=$?
+
+if [ "$backup_exit" = "0" ];
+then
+    info "Backup finished successfully"
+    notify-send "rsync" "Daily backup completed successfully."
+elif [ "$backup_exit" = "1" ]
+then
+    info "Backup finished with warnings"
+    notify-send "rsync" "Daily backup finished with warnings."
+else
+    info "Backup and/or Prune finished with errors"
+    notify-send "rsync" "Daily backup was unsuccessful."
+fi
+
+exit $backup_exit

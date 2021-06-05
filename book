@@ -12,9 +12,9 @@ then
     tabbed -c -r 2 zathura -e id $books & disown
     echo "Opened $n_books books."
     cd $CWD
-    exit 0
 else
     echo "No books selected."
     cd $CWD
     exit 1
 fi
+exit 0

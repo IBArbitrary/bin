@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+cwd=$(pwd)
+BOOK_DIR="/media/storage/books"
+cd $BOOK_DIR
+subject=$(find * -maxdepth 0 -type d | dmenu -i)
+echo "after subject before topic $(pwd)"
+topic=$(cd "$subject"; find * -maxdepth 0 -type d | dmenu -i)
+echo "after topic before book $(pwd)"
+books=$(cd "$topic"; find * -type f | dmenu -i)
+echo "after book $(books)"
+# tabbed -c -r 2 zathura -e id $books
+cd $cwd

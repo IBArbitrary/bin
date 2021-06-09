@@ -7,14 +7,20 @@ option3="bashtop"
 option4="glances"
 option5="vtop"
 option6="bottom"
+option7="atop"
+option8="gotop"
 
 # options to be displyed
-options="$option1\n$option2\n$option3\n$option4\n$option5\n$option6"
+options="$option1\n$option2\n$option3\n$option4\n$option5\n$option6\n$option7\n$option8"
 
 selected="$(echo -e "$options" | dmenu -p 'monitors: ' -i)"
 if [ $selected ];
 then
-    $term $selected
+    if [ "$selected" = "bottom" ];then
+        $term btm
+    else
+        $term $selected
+    fi
     exit 0
 else
     exit 1

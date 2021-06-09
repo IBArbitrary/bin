@@ -7,7 +7,7 @@ option2="window"
 # options to be displyed
 options="$option0\n$option1\n$option2"
 
-selected="$(echo -e "$options" | rofi -lines 3 -dmenu -p "scrot")"
+selected="$(echo -e "$options" | dmenu -i -p "scrot")"
 case $selected in
     $option0)
         cd ~/Pictures/scrots/ && sleep 1 && scrot;;

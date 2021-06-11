@@ -1,18 +1,13 @@
 #!/usr/bin/env bash
-
+monitors=("kitty" "top" "htop" "bashtop" "glances" "vtop" "bottom" "atop" "gotop")
 term="kitty"
-option1="top"
-option2="htop"
-option3="bashtop"
-option4="glances"
-option5="vtop"
-option6="bottom"
-option7="atop"
-option8="gotop"
 
-# options to be displyed
-options="$option1\n$option2\n$option3\n$option4\n$option5\n$option6\n$option7\n$option8"
-
+options="${monitors[0]}"
+for monitor in "${monitors[@]:1}";
+do
+    options+="\n"
+    options+="$monitor"
+done
 selected="$(echo -e "$options" | dmenu -p 'monitors: ' -i)"
 if [ $selected ];
 then

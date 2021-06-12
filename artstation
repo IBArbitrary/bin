@@ -1,0 +1,129 @@
+#!/usr/bin/env python3
+
+import requests
+from bs4 import BeautifulSoup
+import sys
+import os
+import subprocess
+
+
+class ArtstationDownloader:
+
+    def __init__(self,
+                 artists: list):
+        self.artists = artists
+        self.artist_links = []
+        for artist in self.artists:
+            self.artist_links.append(f"https://{artist}.artstation.com/projects")
+        self.projects = {}
+        self.selected = []
+        self.temp_dir = "/tmp/artstation-downloader/"
+
+    def get_data(self, url: str) -> str:
+        return requests.get(url).text
+
+    def get_album(self, link_artist: str) -> list:
+        html_data = self.get_data(link_artist)
+        soup_data = BeautifulSoup(html_data, 'html.parser')
+        album = []
+        for link in soup_data.find_all('a'):
+            link_project = link.get('href')
+            if "/projects/" in link_project:
+                thumb = link.find('img').get('src').split("?")[0]
+                name = thumb.split("/")[-3]+"."+thumb.split(".")[-1]
+                link_project=link_artist+"/"+link_project.split("/")[-1]
+                album.append([name, {"thumb":thumb, "project":link_project}])
+            else:
+                continue
+        if album:
+            for img in album:
+                self.projects[img[0]]=img[1]
+        else:
+            raise Exception("No album images found in the given link.")
+
+    def get_albums(self):
+        print("Getting album images... ",end="")
+        if self.artist_links:
+            for artist_link in self.artist_links:
+                self.get_album(artist_link)
+            print("done.")
+        else:
+            raise Exception("No links provided.")
+
+    def print_pretty(self, flag):
+        if not self.projects:
+            self.get_albums()
+        if flag == "p":
+            thing = "project"
+        elif flag == "t":
+            thing = "thumb"
+        else:
+            raise Exception("Invalid value entered for type to retrieve.")
+        for project in self.projects:
+            print(project[thing])
+
+    def save_thumbs(self):
+        if not self.projects:
+            self.get_albums()
+        if not os.path.isdir(self.temp_dir):
+            subprocess.run(f"mkdir {self.temp_dir}",
+                           shell=True, check=True,
+                           stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        cwd = os.getcwd()
+        os.chdir(self.temp_dir)
+        n_thumb = len(list(self.projects))
+        print(f"Retrieving {n_thumb} project thumnails... ", end="")
+        for project_name in list(self.projects):
+            project = self.projects[project_name]
+            thumb = project["thumb"]
+            name = project_name
+            #print(f"Downoading {name}...", end="")
+            with requests.get(thumb, stream=True) as thumb_img:
+                with open(name, "wb") as img_file:
+                    for chunk in thumb_img.iter_content(chunk_size=1024):
+                        if chunk:
+                            img_file.write(chunk)
+            #print("Done.")
+        print("done.")
+        self.selected = [img[2:]
+                         for img in os.popen(
+                                 "sxiv -t . -o").read().split("\n")][:-1]
+        os.chdir(cwd)
+        subprocess.run(f"rm -rf {self.temp_dir}",
+                       shell=True, check=True,
+                       stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+    def get_project(self,link:str):
+        html_data = self.get_data(link)
+        soup_data = BeautifulSoup(html_data, 'html.parser')
+        for img in soup_data.find_all('img', class_='project-assets-image'):
+            img_src = img.get('src')
+            img_name = img_src.split("?")[-1]
+            img_src = img_src.split("?")[0]
+            img_name = img_name+"."+img_src.split(".")[-1]
+            with requests.get(img_src, stream=True) as img_stream:
+                with open(img_name, "wb") as img_file:
+                    for chunk in img_stream.iter_content(chunk_size=1024):
+                        if chunk:
+                            img_file.write(chunk)
+
+    def save_images(self):
+        if not self.selected:
+            self.save_thumbs()
+        print(f"Downloading {len(self.selected)} projects... ", end="")
+        for sel_project in list(self.selected):
+            url = self.projects[sel_project]["project"]
+            name = url.split("/")[-1]
+            #print(f"Downlaoding {name}...", end="")
+            self.get_project(url)
+            #print("Done.")
+        print("done.")
+        #print(f"Downloaded {len(self.selected)} images successfully.")
+
+if __name__ == "__main__":
+    links = sys.argv[1:]
+    if links[0] in ["h", "-h", "--help", "--h", "-help", "help"]:
+        print("Usage: artstation [artist-id-1] [artist-id-2] ...")
+    else:
+        downloader = ArtstationDownloader(links)
+        downloader.save_images()

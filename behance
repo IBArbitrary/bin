@@ -1,0 +1,126 @@
+#!/usr/bin/env python
+
+import requests
+from bs4 import BeautifulSoup
+import sys
+import os
+import subprocess
+
+
+class BehanceDownloader:
+
+    def __init__(self,
+                 links: list,
+                 prefix="https://mir-s3-cdn-cf.behance.net/project_modules/"):
+        self.links = links
+        self.prefix = prefix
+        self.prefix_len = len(self.prefix)
+        self.images = {}
+        self.selected = []
+        self.temp_dir = "/tmp/behance-downloader/"
+
+    def get_data(self, url: str) -> str:
+        request = requests.get(url)
+        return request.text
+
+    def get_album(self, link: str) -> list:
+        html_data = self.get_data(link)
+        soup_data = BeautifulSoup(html_data, 'html.parser')
+        album = []
+        for item in soup_data.find_all('img'):
+            if item['src'][:self.prefix_len] == self.prefix:
+                srcset = item['srcset']
+                if srcset[-1] == ",":
+                    source = srcset.split(",")
+                    image = source[-2]
+                else:
+                    source = srcset.split(", ")
+                    image = source[-1]
+                thumb = source[0].split(" ")[0]
+                image = image.split(" ")[0]
+                name = thumb.split("/")[-1]
+                album.append([name,{"thumb":thumb, "image":image}])
+            else:
+                continue
+        if album:
+            for img in album:
+                self.images[img[0]]=img[1]
+        else:
+            raise Exception("No album images found in the given link.")
+
+    def get_albums(self):
+        print("Getting album images... ",end="")
+        if self.links:
+            for link in links:
+                self.get_album(link)
+            print("done.")
+        else:
+            raise Exception("No links provided.")
+
+    def print_pretty(self, flag):
+        if not self.images:
+            self.get_albums()
+        if flag == "i":
+            thing = "image"
+        elif flag == "t":
+            thing = "thumb"
+        else:
+            raise Exception("Invalid value entered for type to retrieve.")
+        for image in self.images:
+            print(image[thing])
+
+    def save_thumbs(self):
+        if not self.images:
+            self.get_albums()
+        if not os.path.isdir(self.temp_dir):
+            subprocess.run(f"mkdir {self.temp_dir}",
+                           shell=True, check=True,
+                           stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        cwd = os.getcwd()
+        os.chdir(self.temp_dir)
+        n_thumb = len(list(self.images))
+        print(f"Retrieving {n_thumb} thumnails... ", end="")
+        for img in list(self.images):
+            image = self.images[img]
+            thumb = image["thumb"]
+            name = img
+            #print(f"Downoading {name}...", end="")
+            with requests.get(thumb, stream=True) as thumb_img:
+                with open(name, "wb") as img_file:
+                    for chunk in thumb_img.iter_content(chunk_size=1024):
+                        if chunk:
+                            img_file.write(chunk)
+            #print("Done.")
+        print("done.")
+        self.selected = [img[2:]
+                         for img in os.popen(
+                                 "sxiv -t . -o").read().split("\n")][:-1]
+        os.chdir(cwd)
+        subprocess.run(f"rm -rf {self.temp_dir}",
+                       shell=True, check=True,
+                       stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+    def save_images(self):
+        if not self.selected:
+            self.save_thumbs()
+        print(f"Downloading {len(self.selected)} images... ", end="")
+        for sel_image in list(self.selected):
+            url = self.images[sel_image]["image"]
+            name = url.split("/")[-1]
+            #print(f"Downlaoding {name}...", end="")
+            with requests.get(url, stream=True) as img:
+                with open(name, "wb") as img_file:
+                    for chunk in img.iter_content(chunk_size=1024):
+                        if chunk:
+                            img_file.write(chunk)
+            #print("Done.")
+        print("done.")
+        #print(f"Downloaded {len(self.selected)} images successfully.")
+
+if __name__ == "__main__":
+    links = sys.argv[1:]
+    if links[0] in ["h", "-h", "--help", "--h", "-help", "help"]:
+        print("Usage: behance [link1] [link2] ...")
+    else:
+        downloader = BehanceDownloader(links)
+        downloader.save_images()

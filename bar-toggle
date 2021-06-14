@@ -1,22 +1,16 @@
 #!/usr/bin/env bash
 
 BAR_HEIGHT=18
+BAR_STATE=$HOME/data/state-files/.bar-state
 
-case $1 in
-    "hide")
-        polybar-msg cmd hide
-
-        #sleep 0.1
-        bspc config top_padding 0
-        bspc config bottom_padding 0
-        ;;
-
-    "show")
-        # Is reversed so it would like the action was undoed.
-        bspc config top_padding $BAR_HEIGHT
-        bspc config bottom_padding $BAR_HEIGHT
-
-        #sleep 0.1
-        polybar-msg cmd show
-        ;;
-esac
+if [ ! -e $BAR_STATE ]; then
+    touch $BAR_STATE
+    polybar-msg cmd hide
+    bspc config top_padding 0
+    bspc config bottom_padding 0
+else
+    rm $BAR_STATE
+    bspc config top_padding $BAR_HEIGHT
+    bspc config bottom_padding $BAR_HEIGHT
+    polybar-msg cmd show
+fi

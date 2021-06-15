@@ -2,19 +2,44 @@
 
 cwd=$(pwd)
 BOOK_DIR="/media/storage/books"
-cd $BOOK_DIR || exit 1
-subject=$(find ./* -maxdepth 0 -type d | dmenu -i)
-echo "after subject before topic $(pwd)"
-topic=$(
+
+case $1 in
+stagger)
+	cd $BOOK_DIR || exit 1
+	subject=$(find -- * -maxdepth 0 -type d | dmenu -i -p "subject")
+	if [ ! -e "$subject" ]; then
+		exit 1
+	fi
 	cd "$subject" || exit 1
-	find ./* -maxdepth 0 -type d | dmenu -i
-)
-echo "after topic before book $(pwd)"
-books=$(
+	#echo "after subject before topic $(pwd)"
+	topic=$(
+		find -- * -maxdepth 0 -type d | dmenu -i -p "topic"
+	)
+	if [ ! -e "$topic" ]; then
+		exit 1
+	fi
 	cd "$topic" || exit 1
-	find ./* -type f | dmenu -i
-)
-echo "after book $(books)"
-# tabbed -c -r 2 zathura -e id $books
+	#echo "after topic before book $(pwd)"
+	books=$(
+		find -- * -type f | dmenu -i -p "book"
+	)
+	#echo "after book $books"
+	echo "$books is books"
+	if [ -e "$books" ]; then
+		zathura "$books"
+	else
+		exit 1
+	fi
+	;;
+all)
+	cd $BOOK_DIR || exit 1
+	books=$(find -- * -type f | dmenu -i -p "book")
+	if [ -e "$books" ]; then
+		zathura "$books"
+	else
+		exit 1
+	fi
+	;;
+esac
 cd "$cwd" || exit 1
-echo "$books"
+#echo "$books"

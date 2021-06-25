@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+
+prefix="https://sci-hub.se"
+
+case $1 in
+    -h | --help)
+        echo "usage: sci-hub [url/doi]"
+        exit 0
+        ;;
+esac
+
+inp=$1
+start=$(echo $inp | cut -c -3)
+
+if [ "$start" = "htt" ]; then
+    link="$prefix/$inp"
+else
+    if [ "$start" = "doi" ] || [ "$start" = "DOI" ]; then
+        doi=$(echo "$inp" | cut -d ":" -f2)
+        link="$prefix/$doi"
+    else
+        link="$prefix/$inp"
+    fi
+fi
+
+sci_hub=$(wget "$link" -O -)
+pdf=$(echo "$sci_hub" |
+    grep -Po "(?<=\"location\.href\=\')(.+)(?=\?download=true)")
+wget "$pdf"
+exit 0

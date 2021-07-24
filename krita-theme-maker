@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+
+input_file=$1
+
+file_name=$(echo "$input_file" |
+    rev |
+    cut -d "." -f2- |
+    rev)
+
+file_format=$(echo "$input_file" |
+    rev |
+    cut -d "." -f1 |
+    rev)
+
+out_file=$(echo "${file_name}.recolor.${file_format}")
+
+cat "$input_file" >"$out_file"
+
+colors=$(cat "$input_file" |
+    grep -Po "(?<=\=)\s?((\d{1,3},){2}\d{1,3})" |
+    uniq)
+
+for orig_col in $(echo "$colors"); do
+    pastel color "$orig_col"
+    read -p "Choose alternative: " new_col
+    new_col=$(pastel format rgb "$new_col" |
+        grep -Po "(?<=rgb\()((\d{1,3}, ){2}\d{1,3})" |
+        sed 's/, /,/g')
+    sed -i "s/$orig_col/$new_col/g" "$out_file"
+done

@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+
+VER="1.4.0"
+PREFIX="https://github.com/processing/p5.js/releases/download"
+FILENAME="p5.js"
+
+LINK=$PREFIX/v$VER/$FILENAME
+
+read -p "Enter project name: " NAME
+mkdir "$NAME"
+cd "$NAME"
+mkdir styles scripts img
+echo "<!DOCTYPE html>
+<html lang="">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>$NAME</title>
+  <style>
+    body {
+      padding: 0;
+      margin: 0;
+    }
+  </style>
+  <script src="./scripts/p5.js"></script>
+  <script src="./scripts/sketch.js"></script>
+</head>
+
+<body>
+  <main>
+  </main>
+</body>
+
+</html>" >index.html
+cd scripts
+wget -q "$LINK"
+echo "function setup() {
+  // put setup code here
+}
+
+function draw() {
+  // put drawing code here
+}" >sketch.js
+cd ../styles
+touch style.css
+cd ..
+echo "Project $NAME created."

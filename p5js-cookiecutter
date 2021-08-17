@@ -45,4 +45,5 @@ function draw() {
 cd ../styles
 touch style.css
 cd ..
+git init &> /dev/null
 echo "Project $NAME created."

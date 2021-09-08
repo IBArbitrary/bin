@@ -1,0 +1,18 @@
+#! /usr/bin/env bash
+
+MOVIES_DIR="/media/storage/movies"
+
+CWD=$(pwd)
+cd $MOVIES_DIR
+movies=$(ls | fzf --header="Choose movie.")
+if [ ! -z "$movies" ]; then
+    cd "$movies"
+    mpv . &
+    disown
+    cd $CWD
+else
+    echo "No movie selected."
+    cd $CWD
+    exit 1
+fi
+exit 0

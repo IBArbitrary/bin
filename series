@@ -1,0 +1,18 @@
+#! /usr/bin/env bash
+
+SERIES_DIR="/media/storage/series"
+
+CWD=$(pwd)
+cd $SERIES_DIR
+series=$(find * -type f |
+            fzf --header="Choose series.")
+if [ ! -z "$series" ]
+then
+    mpv "$series" & disown
+    cd $CWD
+else
+    echo "No series selected."
+    cd $CWD
+    exit 1
+fi
+exit 0

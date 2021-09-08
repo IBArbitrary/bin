@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+cwd=$(pwd)
+MOVIES_DIR="/media/storage/movies/"
+cd $MOVIES_DIR || exit 1
+movie=$(find -- * -maxdepth 0 -type d | dmenu -i -p "movie")
+if [ -e "$movie" ]; then
+    cd "$movie" || exit 1
+    mpv .
+else
+    exit 1
+fi
+cd "$cwd" || exit 1

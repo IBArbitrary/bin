@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+bib_dat_file='/home/rajeshkumar/data/bib_data'
+
+option=$(zotbib-rofi-helper |
+    rofi -markup -markup-rows -dmenu \
+        -sep '|' -i -eh 2 -p 'Choose paper' \
+        -format d -matching fuzzy)
+
+if [ ! -z "$option" ]; then
+    pdf_file=$(sed -n "$option"p "$bib_dat_file")
+    bspc rule -a \* -o state=floating rectangle=800x1000+0+0 center=true && zathura "$pdf_file"
+fi

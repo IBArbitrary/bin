@@ -1,0 +1,36 @@
+#!/usr/bin/env python3
+
+import re
+import sys
+
+BIB_FILE = "/media/storage/documents/zotero/library.bib"
+pdf_dat_file = "/home/rajeshkumar/data/bib_data"
+
+AUTH_COL = "#bdae93"
+
+with open(BIB_FILE) as file:
+    bibfileorig = re.sub(r"(\\[^a-zA-Z\d\s])*[{}]*", "", file.read()).strip()
+
+bibfile = bibfileorig.split("\n\n")
+
+
+n_papers = len(bibfile)
+
+title = re.findall(r"(?<= title = )(.*)(?=,\n)", bibfileorig)
+year = re.findall(r"(?<= year = )(\d{4}.*)(?=,\n)", bibfileorig)
+author = re.findall(r"(?<= author = )(.*)(?=,\n)", bibfileorig)
+pdf = re.findall(r"(?<= file = )(.*\.pdf)", bibfileorig)
+
+outstr = ""
+
+for _ in range(n_papers):
+    outstr += title[_] + "\n"
+    outstr += (
+        f"<span color='{AUTH_COL}'><i>  " + author[_] + f"</i> ({year[_]})</span>|"
+    )
+
+pdfs = "\n".join(pdf)
+with open(pdf_dat_file, "w") as file:
+    file.write(pdfs)
+
+print(outstr)

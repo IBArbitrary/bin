@@ -33,4 +33,4 @@ pdfs = "\n".join(pdf)
 with open(pdf_dat_file, "w") as file:
     file.write(pdfs)
 
-print(outstr)
+print(outstr.strip()[:-1])

@@ -5,7 +5,7 @@ bib_dat_file='/home/rajeshkumar/data/bib_data'
 option=$(zotbib-rofi-helper |
     rofi -markup -markup-rows -dmenu \
         -sep '|' -i -eh 2 -p 'Choose paper' \
-        -format d -matching fuzzy)
+        -format d -matching normal)
 
 if [ ! -z "$option" ]; then
     pdf_file=$(sed -n "$option"p "$bib_dat_file")

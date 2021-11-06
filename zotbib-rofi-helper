@@ -9,7 +9,8 @@ pdf_dat_file = "/home/rajeshkumar/data/bib_data"
 AUTH_COL = "#bdae93"
 
 with open(BIB_FILE) as file:
-    bibfileorig = re.sub(r"(\\[^a-zA-Z\d\s])*[{}]*", "", file.read()).strip()
+    content = file.read().strip()
+    bibfileorig = re.sub(r"(\\[^a-zA-Z\d\s])*[{}]*", "", content).strip()
 
 bibfile = bibfileorig.split("\n\n")
 
@@ -17,11 +18,16 @@ bibfile = bibfileorig.split("\n\n")
 n_papers = len(bibfile)
 
 title = re.findall(r"(?<= title = )(.*)(?=,\n)", bibfileorig)
-year = re.findall(r"(?<= year = )(\d{4}.*)(?=,\n)", bibfileorig)
+year = re.findall(r"(?<= year = )(\d{4})(?=.*,\n)", bibfileorig)
 author = re.findall(r"(?<= author = )(.*)(?=,\n)", bibfileorig)
 pdf = re.findall(r"(?<= file = )(.*\.pdf)", bibfileorig)
 
 outstr = ""
+
+#print(len(title))
+#print(len(year))
+#print(len(author))
+#print(len(pdf))
 
 for _ in range(n_papers):
     outstr += title[_] + "\n"

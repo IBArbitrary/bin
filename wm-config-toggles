@@ -2,8 +2,8 @@
 
 BAR_HEIGHT=18
 GAP=10
-BORDER_WIDTH=4
-BORDER_WIDTH_THIN=2
+BORDER_WIDTH=2
+BORDER_WIDTH_THIN=1
 
 GAP_STATE=$HOME/data/state-files/.gap-state
 BAR_STATE=$HOME/data/state-files/.bar-state

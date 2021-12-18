@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+if [ $# -lt 1 ]; then
+    echo "Usage: `basename $0` input_1.mp4 input_2.mp4 ... output.mp4"
+    exit 0
+fi
+
+ARGS=("$@") # determine all arguments
+output=${ARGS[${#ARGS[@]}-1]} # get the last argument (output file)
+unset ARGS[${#ARGS[@]}-1] # drop it from the array
+(for f in "${ARGS[@]}"; do echo "file '$f'"; done) > .vid-cat-tmpfile
+ffmpeg -f concat -i .vid-cat-tmpfile -vcodec copy -acodec copy $output
+rm .vid-cat-tmpfile

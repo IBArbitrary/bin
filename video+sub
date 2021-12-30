@@ -32,7 +32,10 @@ else:
 
 def merger(video, sub, out):
     if video[-3:] in ["mp4", "mkv", "avi"] and sub[-3:] == "srt":
-        if out[-3:] == "mp4":
+        if out[-3:] in ["mp4", "avi"]:
+            out = out.split(".")
+            out[-1] = "mp4"
+            out = ".".join(out)
             command = f"""ffmpeg -i {video} -f srt -i {sub} -map 0:0 -map 0:1 \
 -map 1:0 -c:v copy -c:a copy -c:s mov_text {out}"""
         elif out[-3:] == "mkv":

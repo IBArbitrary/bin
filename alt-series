@@ -23,7 +23,7 @@ case $1 in
         )
         if [ -e "$episode" ]; then
             ep_no=$(echo "$episode" | grep -Po "(?<=s\d{2}e)(\d{2})(?=.*)")
-            ep_no="$(($ep_no - 1))"
+            ep_no="$((ep_no - 1))"
             mpv . --playlist-start="$ep_no"
         else
             exit 1

@@ -24,10 +24,13 @@ pdf = re.findall(r"(?<= file = )(.*\.pdf)", bibfileorig)
 
 outstr = ""
 
-#print(len(title))
-#print(len(year))
-#print(len(author))
-#print(len(pdf))
+if not len(title)==len(year)==len(author)==len(pdf)==n_papers:
+    print('title\t',len(title))
+    print('year\t',len(year))
+    print('author\t',len(author))
+    print('pdf\t',len(pdf))
+    print('papers\t',n_papers)
+    raise Exception("Information not of equal dimensions.")
 
 for _ in range(n_papers):
     outstr += title[_] + "\n"

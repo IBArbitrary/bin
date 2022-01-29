@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+
+bookmarks=$(buku -p -f 3 --nostdin | sed 's/\t/. /g')
+
+themestr="window {
+    width: 35%;
+}
+
+listview {
+    padding: 10px 10px 10px 10px;
+    lines: 10;
+}
+"
+
+index=$(echo "$bookmarks" |
+    sed -n '1d;p' |
+    rofi -dmenu -format 'd' -i -theme-str "$themestr" -p "Choose bookmark")
+
+if [ ! -z "$index" ]; then
+    buku -o "$index"
+fi

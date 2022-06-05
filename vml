@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+vmname=$(VBoxManage list vms | grep -Po "(?<=\")(.*$1.*)(?=\")")
+VBoxManage startvm "$vmname"

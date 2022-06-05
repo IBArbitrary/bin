@@ -1,4 +1,17 @@
 #!/usr/bin/env bash
 
-vmname=$(VBoxManage list vms | grep -Po "(?<=\")(.*$1.*)(?=\")")
-VBoxManage startvm "$vmname"
+if [ ! -z "$1" ]; then
+    vmname=$(VBoxManage list vms | grep -Po "(?<=\")(.*$1.*)(?=\")")
+    notify-send "VirtualBox" "Starting $vmname..." -i /usr/share/pixmaps/VBox.png
+    VBoxManage startvm "$vmname"
+    dunstctl close
+    notify-send "VirtualBox" "$vmname has been started." -i /usr/share/pixmaps/VBox.png
+else
+    rvms=$(VBoxManage list runningvms | grep -Po "(?<=\")(.*)(?=\" {.*)")
+    if [ ! -z "$rvms" ]; then
+        notify-send "VirtualBox" "Freezing $rvms..." -i /usr/share/pixmaps/VBox.png
+        VBoxManage controlvm "$rvms" savestate
+        dunstctl close
+        notify-send "VirtualBox" "$rvms has been frozen." -i /usr/share/pixmaps/VBox.png
+    fi
+fi

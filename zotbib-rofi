@@ -3,11 +3,22 @@
 bib_dat_file='/home/rajeshkumar/data/bib_data'
 
 option=$(zotbib-rofi-helper |
-    rofi -markup -markup-rows -dmenu \
+    rofi -markup -markup-rows -dmenu -multi-select \
         -sep '|' -i -eh 2 -p 'Choose paper' \
         -format d -matching normal)
 
 if [ ! -z "$option" ]; then
-    pdf_file=$(sed -n "$option"p "$bib_dat_file")
-    bspc rule -a \* -o state=floating rectangle=800x1000+0+0 center=true && zathura "$pdf_file"
+    npapers=$(echo "$option" | wc -l)
+    if [ "$npapers" -eq 1 ]; then
+        pdf_file=$(sed -n "$option"p "$bib_dat_file")
+        bspc rule -a \* -o state=floating rectangle=800x1000+0+0 center=true && zathura "$pdf_file"
+    else
+        pdf_file=""
+        while IFS= read -r paper; do
+            pdf_file_t=$(sed -n "$paper"p "$bib_dat_file")
+            pdf_file+="$pdf_file_t "
+        done <<<"$option"
+        command="bspc rule -a \* -o state=floating rectangle=800x1000+0+0 center=true && tabbed -c -r 2 zathura -e id $pdf_file & disown"
+        eval $command
+    fi
 fi

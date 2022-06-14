@@ -34,8 +34,12 @@ case $1 in
     all)
         cd $BOOK_DIR || exit 1
         books=$(find -- * -type f | dmenu -i -F -p "book")
-        if [ -e "$books" ]; then
+        nbooks=$(echo "$books" | wc -l)
+        if [ "$nbooks" -eq 1 ]; then
             zathura "$books"
+        elif [ "$nbooks" -gt 1 ]; then
+            command="tabbed -c -r 2 zathura -e id $books & disown"
+            eval $command
         else
             exit 1
         fi

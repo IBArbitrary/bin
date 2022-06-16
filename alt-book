@@ -34,7 +34,7 @@ case $1 in
     all)
         cd $BOOK_DIR || exit 1
         books=$(find -- * -type f | dmenu -i -F -p "book")
-        nbooks=$(echo "$books" | wc -l)
+        nbooks=$(echo "$books" | sed -r '/^\s*$/d' | wc -l)
         if [ "$nbooks" -eq 1 ]; then
             zathura "$books"
         elif [ "$nbooks" -gt 1 ]; then

@@ -1,0 +1,60 @@
+#!/usr/bin/env bash
+
+WP_DIR="/media/storage/pictures/wallpapers/"
+N_IMG=$(ls "$WP_DIR" | wc -l)
+INIT_IMG="$WP_DIR/$INIT_IMG"
+DB_FILE="$HOME/data/wallpaper-db"
+WP_FILE="$HOME/data/state-files/.wallpaper"
+
+function ind_to_name {
+    index=$1
+    update_db
+    imgname=$(cat "$DB_FILE" | sed -n "${index}p")
+    echo "${WP_DIR}${imgname}"
+}
+
+function ind_to_set {
+    index=$1
+    img=$(ind_to_name $index)
+    echo "$index $img" >"$WP_FILE"
+    feh --bg-fill "$img"
+}
+
+function update_db {
+    ls "$WP_DIR" >"$DB_FILE"
+}
+
+function random_set {
+    r_n=$((RANDOM % $N_IMG + 1))
+    ind_to_set "$r_n"
+}
+
+function change_img {
+    r_i=$(cat "$WP_FILE" | cut -d " " -f 1)
+    delta=$1
+    r_o=$(((r_i + delta) % N_IMG))
+    ind_to_set $r_o
+}
+
+case $1 in
+    next)
+        change_img 1
+        ;;
+    prev)
+        change_img -1
+        ;;
+    init)
+        if [ ! -f "$WP_FILE" ]; then
+            random_set
+        else
+            img=$(cat "$WP_FILE" | cut -d " " -f 2)
+            feh --bg-fill "$img"
+        fi
+        ;;
+    random)
+        random_set
+        ;;
+    *)
+        change_img 1
+        ;;
+esac

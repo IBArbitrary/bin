@@ -1,0 +1,62 @@
+#!/bin/sh
+
+pmenu -e <<EOF
+APP
+	BRWSR
+		ff				firefox
+		ggl				google-chrome-stable
+		srf				tabbed surf -e
+	MEDIA
+		mpdvl			mpdevil
+		sptfy			spotify-launcher
+		ncmp			bspc rule -a \* -o state=floating && kitty ncmpcpp
+	DSGN
+		ink				inkscape
+		gmp				gimp
+		azp				azpainterb
+		blndr			prime-run blender & disown
+		krta			krita
+	OFFC
+		emcs			emacs
+		vsc				code
+		msp				mousepad
+		lbro			libreoffice
+		txst			texstudio
+		zot				zotero
+	UTIL
+		col				cpicker
+		qal				qalculate-gtk
+		dscrd			discord
+		SS
+			gui			flameshot gui
+			win			maim -s -u | xclip -selection c -t image/png; notify-send 'Copied window to clipboard.'
+		cam 			cam
+		fm				dolphin
+TERM
+	st					st
+	kty
+		flt				bspc rule -a \* -o state=floating rectangle=800x400+0+0 center=true && kitty -o font_size=11
+		kty				kitty
+WM
+	flag
+		stck			bspc node $(bspc query -N -n focused.window) -g sticky
+		lck				bspc node $(bspc query -N -n focused.window) -g locked
+		mrk				bspc node $(bspc query -N -n focused.window) -g marked
+		hd				bspc node $(bspc query -N -n focused.window) -g hidden
+	quit				bspc quit
+	rstrt				bspc wm -r
+PWR
+	lck					env XSECURELOCK_COMPOSITE_OBSCURER=0 XSECURELOCK_PASSWORD_PROMPT=hidden XSECURELOCK_SHOW_DATETIME=1 XSECURELOCK_SHOW_HOSTNAME=0 XSECURELOCK_SHOW_USERNAME=0  xsecurelock
+	sus
+		yes 			playerctl pause; systemctl suspend
+		no
+	lgt
+		yes				bspc quit
+		no
+	rbt					
+		yes				systemctl reboot
+		no
+	off					
+		yes				systemctl poweroff
+		no
+EOF

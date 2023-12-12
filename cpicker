@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+
+dim_off='s/inactive-dim \= 0\.2\;/inactive-dim \= 0\.0\;/'
+dim_on='s/inactive-dim \= 0\.0\;/inactive-dim \= 0\.2\;/'
+
+
+CFG_FILE="$XDG_CONFIG_HOME/picom/picom.conf"
+
+function runner {
+    sed -i "$dim_off" "$CFG_FILE"
+    ($1)
+    sed -i "$dim_on" "$CFG_FILE"
+    exit 0
+}
+
+function xc {
+    TEMPFILE="/tmp/ss-xc.png"
+    xcolor -s clipboard -S 10 -P 100
+    col=$(xclip -selection clipbard -o)
+    convert -size 32x32 xc:"$col" "$TEMPFILE"
+    notify-send "xcolor" "The color is $col." -i "/tmp/ss-xc.png" -t 10000
+    rm "$TEMPFILE"
+}
+
+runner xc

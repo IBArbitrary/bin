@@ -6,9 +6,9 @@
 : "${LOCKED_ACTIVE_BCOLOR:=0xff98971a}"
 : "${LOCKED_FOCUSED_BCOLOR:=0xffb8bb26}"
 # colors for sticky windows
-: "${STICKY_NORMAL_BCOLOR:=0xff458588}"
-: "${STICKY_ACTIVE_BCOLOR:=0xff458588}"
-: "${STICKY_FOCUSED_BCOLOR:=0xff83af98}"
+: "${STICKY_NORMAL_BCOLOR:=0xff689d6a}"
+: "${STICKY_ACTIVE_BCOLOR:=0xff689d6a}"
+: "${STICKY_FOCUSED_BCOLOR:=0xff8ec07c}"
 # colors for marked windows
 : "${MARKED_NORMAL_BCOLOR:=0xffd79921}"
 : "${MARKED_ACTIVE_BCOLOR:=0xffd79921}"

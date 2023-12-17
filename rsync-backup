@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-info () {
-    printf "\n%s %s\n\n" "$(date)" "$argv" >&2;
+info() {
+    printf "\n%s %s\n\n" "$(date)" "$argv" >&2
 }
 
 trap 'echo $( date ) Backup interrupted >&2; exit 2' INT TERM
@@ -9,26 +9,13 @@ trap 'echo $( date ) Backup interrupted >&2; exit 2' INT TERM
 info "Starting backup"
 notify-send "rsync" "Starting daily backup..."
 
-export BACKUP_LOCATION='/media/storage/backup/arch/'
+export BACKUP_LOCATION='/media/storage/backup/arch-backup/'
+export BACKUP_LOCATION2='/media/storage/backup/arch-backup/home/rajeshkumar/'
 
 sudo rsync -aAXHRv \
     --delete \
     --exclude caches/ \
-    --exclude '/home/*/.cache/*' \
-    --exclude '/var/tmp/*' \
-    --exclude '/var/cache/*' \
-    --exclude '/var/lock/*' \
-    --exclude '/var/run/*' \
-    --exclude '/var/spool/*' \
-    --exclude '/opt/*' \
-    --exclude '/dev/*' \
-    --exclude '/tmp/*' \
-    --exclude '/proc/*' \
-    --exclude '/lost+found' \
-    --exclude '/mnt/*' \
-    --exclude '/media/*' \
-    --exclude '/run/*' \
-    --exclude '/sys/*' \
+    --exclude-from "$HOME/data/rsync-backup-exclusions.txt" \
     /etc \
     /home \
     /root \
@@ -36,14 +23,20 @@ sudo rsync -aAXHRv \
     /usr/local \
     $BACKUP_LOCATION
 
+
+sudo rsync -aAXHRv \
+    --delete \
+    --exclude caches/ \
+    --exclude-from "$HOME/data/rsync-backup-exclusions-2.txt" \
+    "$HOME" \
+    $BACKUP_LOCATION2
+
 backup_exit=$?
 
-if [ "$backup_exit" = "0" ];
-then
+if [ "$backup_exit" = "0" ]; then
     info "Backup finished successfully"
     notify-send "rsync" "Daily backup completed successfully."
-elif [ "$backup_exit" = "1" ]
-then
+elif [ "$backup_exit" = "1" ]; then
     info "Backup finished with warnings"
     notify-send "rsync" "Daily backup finished with warnings."
 else

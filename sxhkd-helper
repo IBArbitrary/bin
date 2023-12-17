@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 import os
 import re
+import sys
 from rich import print as pprint
 
-CONFIG_FILE_ = f"{os.path.expanduser('~')}/.config/sxhkd/sxhkdrc"
-CONFIG_FILE = f"{os.path.expanduser('~')}/temp/sxtest"
+CONFIG_FILE = f"{os.path.expanduser('~')}/.config/sxhkd/sxhkdrc"
+CONFIG_FILE_ = f"{os.path.expanduser('~')}/temp/sxtest"
 DST = "bold"
 KST = "i green"
 CST = ""
@@ -19,20 +20,21 @@ def globber(content: str):
     out = []
     for _ in content.split("\n\n"):
         _ = _.strip()
-        if _[:4] == "#== ":
+        if _[:4] in ["#== ", "#-- "]:
             out.append(_)
     return out
 
 def breaker(line: str, override: bool = False):
     pattern = r"{(.*?)}"
     matches = re.search(pattern, line)
+    out = [line]
     if matches and (not override):
         parts = matches.group(1).split(",")
-        wholes = [re.sub(r'{.*}', _, line).strip() for _ in parts]
-        return wholes
-    return [line]
+        out = [re.sub(r'{.*}', _, line).strip() for _ in parts]
+        return out
+    return out
 
-def classifier(lines: str):
+def classifier(lines: str, clss: str):
     lines = [_.strip() for _ in lines.split("\n") if _.strip()]
     defn = [_[4:] for _ in breaker(lines.pop(0))]
     keys = []
@@ -52,7 +54,8 @@ def classifier(lines: str):
         "defn": defn,
         "keys": keys,
         "cmds": cmds,
-        "alt": alt
+        "alt": alt,
+        "cls": clss
     }
 
 def printer(hk: dict, ifcmd = False):
@@ -69,7 +72,112 @@ def printer(hk: dict, ifcmd = False):
         pprint(f"[{DST}]{defn[0]}[/{DST}]")
         pprint(" \[or] ".join([f"[{KST}]{_}[/{KST}]" for _ in keys]), "\n")
 
+def runner(path: str):
+    clss = ""
+    out = []
+    for _ in globber(reader(path)):
+        if _[:4] == "#-- ":
+            clss = _[4:]
+            continue
+        else:
+            out.append(classifier(_, clss))
+    return out
 
+def flatcheck(dicts: list):
+    return not sum([_['alt'] for _ in dicts])
 
-for _ in globber(reader(CONFIG_FILE)):
-    printer(classifier(_))
+def flattener(dicts: list):
+    if flatcheck(dicts):
+        out = {}
+        keys = list(dicts[0])
+        for key in keys:
+            out[key] = []
+            for d in dicts:
+                if key in ['alt', 'cls']:
+                    n = len(d['defn'])
+                    out[key] += [d[key]]*n
+                else:
+                    out[key] += d[key]
+    keys = out['keys']
+    for _, key in enumerate(keys):
+        key = re.sub(r"_", "", key)
+        key = re.sub(r"\+\s\s\+", r"+", key)
+        keys[_] = key
+    out['keys'] = keys
+    return out
+
+CMDC = "#ebdbb2"
+CMDF = "/home/rajeshkumar/data/sxhkd_catalog"
+CLSC = "#a89984"
+
+def rofiprint(path: str, symb = False):
+    data = flattener(runner(path))
+    defns = data['defn']
+    keys = data['keys']
+    cmds = data['cmds']
+    clss = data['cls']
+    N = len(defns)
+    dN = max(len(_) for _ in defns)
+    dC = max(len(_) for _ in clss)
+    outstr = ""
+    if symb:
+        subs = {
+            "@": "",
+            "shift": "⇧",
+            "super": "⊞",
+            "alt": "⌥",
+            "ctrl": "⌃",
+            "space": "␣",
+            "Return": "↵",
+            "Tab": "↹",
+            "Escape": "⮹",
+            "comma": ",",
+            "period": ".",
+            "grave": "`",
+            "bracketleft": "[",
+            "bracketright": "]",
+            "XF86Calculator": '🖩',
+            "XF86AudioMute": "Fn + F5",
+            "XF86AudioLowerVolume": "Fn + F6",
+            "XF86AudioRaiseVolume": "Fn + F7",
+            "XF86AudioPrev": "Fn + F8",
+            "XF86AudioPlay": "Fn + F9",
+            "XF86AudioNext": "Fn + F10",
+            "XF86MonBrightnessDown": "Fn + F2",
+            "XF86MonBrightnessUp": "Fn + F3",
+            "XF86Launch2": "🞛",
+            "{1-9,0}": "#",
+            "{1-9}": "#",
+            "Left": "←",
+            "Right": "→",
+            "Down": "↓",
+            "Up": "↑",
+            "Prior": "⭽",
+            "Next": "⭻",
+            "backslash": r"\\",
+            "Print": "⎙",
+            "Delete": "⌦",
+            "button1": "🖱1",
+            "button2": "🖱2",
+            "button8": "🖱>",
+            "button9": "<🖱",
+        }
+        for _, key in enumerate(keys):
+            for skey, ssub in subs.items():
+                key = re.sub(skey, ssub, key)
+            keys[_] = key
+    # for _ in range(N):
+    #     outstr += "<b>"+ defns[_] + "</b>"+ "\n"
+    #     outstr += f"<span color='{CMDC}'><i>" + keys[_] + f"</i></span>|"
+    with open(CMDF, "w") as file:
+        file.write("\n".join(cmds))
+    for _ in range(N):
+        outstr += f"<span color='{CLSC}'>{clss[_].rjust(dC)}</span> <b>{defns[_].ljust(dN)}</b> {keys[_]}|"
+    print(outstr[:-1])
+
+if __name__ == "__main__":
+    n = len(sys.argv)
+    symb = False
+    if n > 1:
+        symb = True
+    rofiprint(CONFIG_FILE, symb=symb)

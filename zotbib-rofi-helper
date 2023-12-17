@@ -33,7 +33,7 @@ if not len(title)==len(year)==len(author)==len(pdf)==n_papers:
     raise Exception("Information not of equal dimensions.")
 
 for _ in range(n_papers):
-    outstr += title[_] + "\n"
+    outstr += "<b>"+title[_]+"</b>" + "\n"
     outstr += (
         f"<span color='{AUTH_COL}'><i>  " + author[_] + f"</i> ({year[_]})</span>|"
     )

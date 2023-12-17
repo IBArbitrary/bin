@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+catalog="$HOME/data/sxhkd_catalog"
+
+if [ -n "$1" ]; then
+    out=$(sxhkd-helper 1)
+    width="900"
+else
+    out=$(sxhkd-helper)
+    width="1100"
+fi
+
+out=$(echo "$out" | rofi -markup -markup-rows -dmenu -sep '|' -i -eh 1 -p "Choose command: " -format d -matching normal -theme-str "window {width: ${width}px;}" -kb-accept-entry "")
+
+if [ -n "$out" ]; then
+    cmd=$(sed -n "$out"p "$catalog")
+    eval "$cmd"
+fi

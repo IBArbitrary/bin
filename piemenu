@@ -10,6 +10,7 @@ APP
 		mpdvl			mpdevil
 		sptfy			spotify-launcher
 		ncmp			bspc rule -a \* -o state=floating && kitty ncmpcpp
+		ntflx			netflix
 	DSGN
 		ink				inkscape
 		gmp				gimp
@@ -23,6 +24,7 @@ APP
 		lbro			libreoffice
 		txst			texstudio
 		zot				zotero
+		oklr			okular
 	UTIL
 		col				cpicker
 		qal				qalculate-gtk
@@ -53,10 +55,10 @@ PWR
 	lgt
 		yes				bspc quit
 		no
-	rbt					
+	rbt
 		yes				systemctl reboot
 		no
-	off					
+	off
 		yes				systemctl poweroff
 		no
 EOF

@@ -5,7 +5,7 @@ bib_dat_file='/home/rajeshkumar/data/bib_data'
 option=$(zotbib-rofi-helper |
     rofi -markup -markup-rows -dmenu -multi-select \
         -sep '|' -i -eh 2 -p 'Choose paper' \
-        -format d -matching normal)
+        -format d -matching normal -theme-str 'window {width: 800px;}')
 
 if [ ! -z "$option" ]; then
     npapers=$(echo "$option" | wc -l)

@@ -20,7 +20,7 @@ n_papers = len(bibfile)
 title = re.findall(r"(?<= title = )(.*)(?=,\n)", bibfileorig)
 year = re.findall(r"(?<= year = )(\d{4})(?=.*,\n)", bibfileorig)
 author = re.findall(r"(?<= author = )(.*)(?=,\n)", bibfileorig)
-pdf = re.findall(r"(?<= file = )(.*\.pdf)", bibfileorig)
+pdf = re.findall(r"(?<= file = )(.*\.pdf)|(.*\.djvu)", bibfileorig)
 
 outstr = ""
 
@@ -38,7 +38,7 @@ for _ in range(n_papers):
         f"<span color='{AUTH_COL}'><i>  " + author[_] + f"</i> ({year[_]})</span>|"
     )
 
-pdfs = "\n".join(pdf)
+pdfs = "\n".join([_[0] for _ in pdf])
 with open(pdf_dat_file, "w") as file:
     file.write(pdfs)
 

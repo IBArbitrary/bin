@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
 while true; do
-    $HOME/bin/bgch
     sleep "$1"s
+    $HOME/bin/bgch
 done

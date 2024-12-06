@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+xdotool type "cbonsai -l -i -b 2 -L 48 -m " "\"rajesh's pc. he will be back.\""
+xdotool key enter
+xdotool key super+f
+xtrlock -f

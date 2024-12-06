@@ -1,0 +1,14 @@
+#/bin/bash
+
+function f1337() {
+  echo $@ | tr '[:upper:]' '[:lower:]' | \
+  tr 'letaos' '137405' | \
+  sed 's/and\ /\&\ /g'
+}
+
+opt="$@"
+[ -n "$opt" ] && f1337 "$opt" && exit
+
+while read stdin; do
+  f1337 "$stdin"
+done

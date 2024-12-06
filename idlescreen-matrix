@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+xdotool type "unimatrix -s 95"
+xdotool key enter
+xdotool key super+f
+xtrlock -f
